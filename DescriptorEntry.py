@@ -1,7 +1,7 @@
 import re, sys, os, os.path
 from itertools import count
 
-DEFAULT_ROOT = r'D:\Games' if os.name == 'nt' else '/var/log/'
+DEFAULT_ROOT = r'T:\Downloads' if os.name == 'nt' else '/var/log'
 ROOT = os.environ.get('MOUNT_POINT', DEFAULT_ROOT)
 
 absolute_path = lambda relative_path: os.path.join(ROOT, relative_path)
