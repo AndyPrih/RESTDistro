@@ -1,8 +1,6 @@
 from flask import Flask, request, Response, abort
-from DescriptorEntry import DescriptorEntry, recursive_list
+from DescriptorEntry import DescriptorEntry, recursive_list, PORT_NUM
 from Zip import stream_generator
-
-PORT_NUM = os.environ.get('PORT', 80)
 
 app = Flask('RESTDistributive')
 
