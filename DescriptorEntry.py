@@ -5,9 +5,15 @@ ROOT = os.path.normpath(os.environ.get('MOUNT_POINT', '/var/log'))
 
 absolute_path = lambda relative_path: os.path.normpath( os.path.join(ROOT, relative_path) )
 
+back_starting = re.compile(r'\.\.[\\\/]')# ../ or \..
+back_dir = re.compile(r'[\\\/]\.\.[\\\/]')# \..\ or /../
+bad_name_symbols = re.compile(r'[\\\*\"\?\:\|<>]')
+
 class DescriptorEntry:
 	def __init__(self, relative = ''):
-		if re.match(re.compile(r'\.\.[\\\/]'), relative) or re.search(re.compile(r'[\\\/]\.\.[\\\/]'), relative):
+		if re.match(back_starting, relative) \
+			or re.search(back_dir, relative) \
+			or re.search(bad_name_symbols, relative):
 			raise ValueError('Bad path %s' % relative)
 		self._relative = relative
 	def __iter__(self):

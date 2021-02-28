@@ -17,7 +17,10 @@ def link(relative, value):
 @app.route('/', defaults={'path': ''}, methods=['GET', 'POST'])
 @app.route('/<path:path>', methods=['GET', 'POST'])
 def landing(path):
-	table = DescriptorEntry(path)
+	try:
+		table = DescriptorEntry(path)
+	except ValueError:
+		abort(404)
 	if not table.is_exists:
 		abort(404)
 	if request.method == 'GET':
