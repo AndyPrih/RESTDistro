@@ -4,36 +4,39 @@ from Zip import stream_generator
 
 app = Flask('RESTDistributive')
 
-@app.route('/download/', defaults={'path': ''})
-@app.route('/download/<path:path>')
-def download(path):
+def submit(relative, value = "скачать"):
+	return """
+	<form action="{relative}" method="POST" style="margin: auto;">
+		<button type="submit">{value}</button>
+	</form>
+	""".format(**locals())
+
+def link(relative, value):
+	return """<a href ="{relative}">{value}</a>""".format(**locals())
+
+@app.route('/', defaults={'path': ''}, methods=['GET', 'POST'])
+@app.route('/<path:path>', methods=['GET', 'POST'])
+def landing(path):
 	table = DescriptorEntry(path)
 	if not table.is_exists:
 		abort(404)
+	if request.method == 'GET':
+		# GET meth
+		parent = '<tr><td width="75px"/><td><a href = "{relative}">..</a></td></tr>'.\
+			format(relative = table.parent.relative) if not table.is_root else ''
+		table_html = ''
+		for i in table:
+			_submit = submit(relative = i.relative)
+			_link = link(relative = i.relative, value = str(i)) if i.is_dir else str(i)
+			table_html += '<tr><td width="75px">{_submit}</td><td>{_link}</td></tr>'.format(**locals())
+		download_all = '<tr><td colspan=2>%s</td></tr>' % \
+			submit(relative = "", value = "скачать всё") if len(table) else ''
+		return '<table>{parent}{table_html}{download_all}</table>'.format(**locals())
+	# POST meth
 	response = Response(stream_generator(table), mimetype='application/zip')
 	response.headers['Content-Disposition'] = 'attachment; filename={name}.zip'.\
 		format(name = str(table) or 'files')
 	return response
-
-@app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
-def landing(path):
-	ul = ''
-	table = DescriptorEntry(path)
-	if not table.is_exists:
-		abort(404)
-	parent = '<li><a href = "{relative}">..</a></li>'.\
-		format(relative = table.parent.relative) if not table.is_root else ''
-	for i in table:
-		if i.is_dir:
-			ul += '<li><a href = "/download/{relative}">скачать</a> <a href = "{relative}">{name}</a></li>'.\
-				format(relative = i.relative, name = i)
-			continue
-		ul += '<li><a href = "download/{relative}">скачать</a> {name}</li>'.\
-			format(relative = i.relative, name = i)
-	download_all = '<a href = "/download/{relative}">скачать все файлы</a>'.\
-		format(relative = table.relative) if len(table) else ''
-	return '<ul>{parent}{ul}{download_all}</ul>'.format(**locals())
 
 if __name__ == '__main__':
 	app.run(host = '0.0.0.0', port = 8080)
