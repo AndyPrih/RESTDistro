@@ -15,14 +15,22 @@ def stream_generator(descriptor_entry):
 			zip_path = shrink(fname.relative, shrink_part) if shrink_part != '.' else fname.relative
 			zs.write(fname.absolute, zip_path)
 		for chunk in zs:
-			os.write(wpipe, chunk)
+			try:
+				_ = os.write(wpipe, chunk)
+			except (BrokenPipeError, IOError):
+				break
+		os.close(wpipe)
 		return
 	os.close(wpipe)
-	r, _, _ = select.select([rpipe], [], [])
-	while True:
-		chunk = os.read(rpipe, 4096)
-		if not chunk: break
-		yield chunk
+	try:
+		while True:
+			r, _, _ = select.select([rpipe], [], [], 15)
+			if not r: break
+			chunk = os.read(rpipe, 4096)
+			if not chunk: break
+			yield chunk
+	finally:
+		os.close(rpipe)
 
 if __name__ == '__main__':
 	if len(sys.argv) <= 1:

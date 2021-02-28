@@ -1,7 +1,7 @@
 import re, sys, os, os.path
 from itertools import count
 
-ROOT = os.path.normpath(os.environ.get('MOUNT_POINT', '/var/log'))
+ROOT = os.path.normpath(os.environ.get('MOUNT_POINT', '/mnt/t/Downloads'))
 
 absolute_path = lambda relative_path: os.path.normpath( os.path.join(ROOT, relative_path) )
 
