@@ -30,7 +30,9 @@ def stream_generator(descriptor_entry):
 			if not chunk: break
 			yield chunk
 	finally:
+		# fuck the zombies!
 		os.close(rpipe)
+		os.wait()
 
 if __name__ == '__main__':
 	if len(sys.argv) <= 1:
