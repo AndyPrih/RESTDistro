@@ -2,6 +2,8 @@ from flask import Flask, request, Response, abort
 from DescriptorEntry import DescriptorEntry, recursive_list
 from Zip import stream_generator
 
+PORT_NUM = os.environ.get('PORT', 80)
+
 app = Flask('RESTDistributive')
 
 def submit(relative, value = "скачать"):
@@ -42,4 +44,4 @@ def landing(path):
 	return response
 
 if __name__ == '__main__':
-	app.run(host = '0.0.0.0', port = 8080)
+	app.run(host = '0.0.0.0', port = PORT_NUM)
