@@ -2,14 +2,18 @@ import sys, select, os, os.path
 from zipstream import ZipFile, ZIP_DEFLATED
 from DescriptorEntry import DescriptorEntry, recursive_list
 
+shrink = lambda path, shrink_part: path[path.find(shrink_part)+len(shrink_part):]
+
 def stream_generator(descriptor_entry):
 	rpipe, wpipe = os.pipe()
 	pid = os.fork()
 	if not pid:
 		os.close(rpipe)
 		zs = ZipFile(mode = 'w', compression = ZIP_DEFLATED)
+		shrink_part = getattr(descriptor_entry.parent, 'relative', '')
 		for fname in recursive_list(descriptor_entry):
-			zs.write(fname.absolute, fname.relative)
+			zip_path = shrink(fname.relative, shrink_part) if shrink_part != '.' else fname.relative
+			zs.write(fname.absolute, zip_path)
 		for chunk in zs:
 			os.write(wpipe, chunk)
 		return

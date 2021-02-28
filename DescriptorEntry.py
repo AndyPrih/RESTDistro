@@ -1,10 +1,9 @@
 import re, sys, os, os.path
 from itertools import count
 
-DEFAULT_ROOT = r'T:\Downloads' if os.name == 'nt' else '/var/log'
-ROOT = os.environ.get('MOUNT_POINT', DEFAULT_ROOT)
+ROOT = os.path.normpath(os.environ.get('MOUNT_POINT', '/var/log'))
 
-absolute_path = lambda relative_path: os.path.join(ROOT, relative_path)
+absolute_path = lambda relative_path: os.path.normpath( os.path.join(ROOT, relative_path) )
 
 class DescriptorEntry:
 	def __init__(self, relative = ''):
@@ -13,9 +12,9 @@ class DescriptorEntry:
 		self._relative = relative
 	def __iter__(self):
 		if self.is_dir:
-			self._files = os.listdir(self.absolute) or [self.absolute,]
+			self._files = os.listdir(self.absolute)
 		elif self.is_file:
-			self._files = [self.absolute,]
+			self._files = []
 		else:
 			self._files = None
 			raise ValueError('This is not file or Directory')
@@ -32,9 +31,23 @@ class DescriptorEntry:
 	@property
 	def relative(self):
 		return self._relative
+	@relative.setter
+	def relative(self, _):
+		raise AttributeError('can not set this attribute directly')
 	@property
 	def absolute(self):
 		return absolute_path(self.relative)
+	@property
+	def parent(self):
+		if self.is_root:
+			return None
+		return self.__class__(
+				os.path.relpath(
+					os.path.dirname(self.absolute), 
+					start = ROOT, ))
+	@property
+	def is_root(self):
+		return self.absolute == ROOT
 	@property
 	def is_dir(self):
 		return os.path.isdir(self.absolute)
@@ -54,10 +67,15 @@ class DescriptorEntry:
 			return len(os.listdir(self.absolute))
 		else:
 			return None
-	def __str__(self):
+	def __repr__(self):
 		return self.relative
+	def __str__(self):
+		return self.relative[self.relative.rfind(os.path.sep)+1:]
 
 def recursive_list(descriptor_entry):
+	if descriptor_entry.is_file:
+		yield descriptor_entry
+		return 
 	for i in descriptor_entry:
 		if i.is_dir:
 			if len(i):
