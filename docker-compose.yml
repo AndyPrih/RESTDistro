@@ -1,0 +1,16 @@
+version: '3.8'
+
+networks:
+  default:
+    external:
+      name: proxy
+
+services:
+  flask:
+    image: rest-distro
+    build: ./
+    container_name: rest-distro
+    environment:
+      - PORT:80
+      - MOUNT_POINT:/var/log
+      - VIRTUAL_HOST=rest-distro
