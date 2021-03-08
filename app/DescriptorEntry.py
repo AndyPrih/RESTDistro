@@ -41,7 +41,7 @@ class DescriptorEntry:
         if offset == len(self._files):
             raise StopIteration
         entry = self.__class__(os.path.join(self.relative,
-                               self._files[offset]))
+                                            self._files[offset]))
         if not entry.is_exists or entry.is_link:
             return next(self)
         return entry
@@ -63,9 +63,9 @@ class DescriptorEntry:
         if self.is_root:
             return None
         return self.__class__(
-                os.path.relpath(
-                    os.path.dirname(self.absolute),
-                    start=ROOT, ))
+            os.path.relpath(
+                os.path.dirname(self.absolute),
+                start=ROOT, ))
 
     @property
     def is_root(self):
@@ -99,7 +99,7 @@ class DescriptorEntry:
         return self.relative
 
     def __str__(self):
-        return self.relative[self.relative.rfind(os.path.sep)+1:]
+        return self.relative[self.relative.rfind(os.path.sep) + 1:]
 
 
 def recursive_list(descriptor_entry):

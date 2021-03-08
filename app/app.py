@@ -32,36 +32,30 @@ def landing(path):
             '<tr><td width="75px"/><td><a href = "{relative}">..</a></td></tr>'
             .format(relative=table.parent.relative)
             if not table.is_root
-            else ''
-            )
+            else '')
         table_html = ''
         for i in table:
             _submit = submit(relative=i.relative)
         _link = (
             link(relative=i.relative, value=str(i))
             if i.is_dir
-            else str(i)
-            )
+            else str(i))
         table_html += (
             '<tr><td width="75px">{_submit}</td><td>{_link}</td></tr>'
-            .format(**locals())
-            )
+            .format(**locals()))
         download_all = (
             '<tr><td colspan=2>%s</td></tr>' %
             submit(relative="", value="скачать всё")
             if len(table)
-            else ''
-            )
+            else '')
         return (
             '<table>{parent}{table_html}{download_all}</table>'
-            .format(**locals())
-            )
+            .format(**locals()))
     # POST meth
     response = Response(stream_generator(table), mimetype='application/zip')
     response.headers['Content-Disposition'] = (
         'attachment; filename={name}.zip'
-        .format(name=str(table) or 'files')
-        )
+        .format(name=str(table) or 'files'))
     return response
 
 

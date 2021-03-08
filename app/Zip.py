@@ -7,7 +7,7 @@ from DescriptorEntry import DescriptorEntry, recursive_list
 
 
 def shrink(path, shrink_part):
-    return path[path.find(shrink_part)+len(shrink_part):]
+    return path[path.find(shrink_part) + len(shrink_part):]
 
 
 def stream_generator(descriptor_entry):
@@ -21,8 +21,7 @@ def stream_generator(descriptor_entry):
             zip_path = (
                 shrink(fname.relative, shrink_part)
                 if shrink_part != '.'
-                else fname.relative
-                )
+                else fname.relative)
             zs.write(fname.absolute, zip_path)
         for chunk in zs:
             try:
