@@ -1,3 +1,5 @@
 **/__pycache__/*
 **/%SystemDrive%/*
 *.pyc
+.venv
+*.sublime-*
